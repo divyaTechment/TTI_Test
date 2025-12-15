@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 def main():
 	print("Hello!! testing file...")
-    print("Hello!! TTI...")
+    print("Hello!! Creating a new file...")
 
 
 
