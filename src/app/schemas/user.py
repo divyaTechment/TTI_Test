@@ -64,6 +64,7 @@ class UserLogin(BaseModel):
     
     email: EmailStr = Field(..., description="User email address")
     password: str = Field(..., description="User password")
+    confirm_password: str = Field(..., description="User Confirm password")
 
 
 class UserResponse(BaseResponseSchema):
