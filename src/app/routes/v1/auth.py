@@ -56,7 +56,7 @@ def get_current_superuser(
     current_user: UserResponse = Depends(get_current_user)
 ) -> UserResponse:
     """
-    Get current superuser.
+    Get current superuser if exists 
     
     Args:
         current_user: Current authenticated user
@@ -72,6 +72,7 @@ def get_current_superuser(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"
         )
+    
     return current_user
 
 
