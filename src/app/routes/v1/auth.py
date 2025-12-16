@@ -52,30 +52,6 @@ def get_current_user(
     return UserResponse.from_orm(user)
 
 
-def get_current_superuser(
-    current_user: UserResponse = Depends(get_current_user)
-) -> UserResponse:
-    """
-    Get current superuser if exists 
-    
-    Args:
-        current_user: Current authenticated user
-        
-    Returns:
-        Current superuser response
-        
-    Raises:
-        HTTPException: If user is not a superuser
-    """
-    if not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions"
-        )
-    
-    return current_user
-
-
 @router.post("/login", response_model=Token, summary="User Login")
 async def login(
     user_credentials: UserLogin,

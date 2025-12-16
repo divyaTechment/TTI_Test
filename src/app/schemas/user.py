@@ -75,7 +75,7 @@ class UserResponse(BaseResponseSchema):
     full_name: Optional[str] = Field(None, description="Full name")
     is_active: bool = Field(..., description="Whether user is active")
     is_verified: bool = Field(..., description="Whether user is verified")
-    
+    is_verified: bool = Field(..., description="Whether user is verified")
     last_login: Optional[datetime] = Field(None, description="Last login timestamp")
 
 
