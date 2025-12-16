@@ -45,3 +45,8 @@ def create_tables():
 def drop_tables():
     """Drop all database tables."""
     Base.metadata.drop_all(bind=engine)
+
+def recreate_tables():
+    """Drop and recreate all database tables."""
+    drop_tables()
+    create_tables()
