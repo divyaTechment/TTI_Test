@@ -48,5 +48,8 @@ def drop_tables():
 
 def recreate_tables():
     """Drop and recreate all database tables."""
+    get_db_session = SessionLocal()
+    db = get_db_session()
+    db.close()
     drop_tables()
     create_tables()
