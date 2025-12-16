@@ -100,7 +100,7 @@ async def login(
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email or password given...",
             headers={"WWW-Authenticate": "Bearer"},
         )
     
@@ -115,7 +115,9 @@ async def logout() -> Dict[str, str]:
     Returns:
         Success message
     """
-    return {"message": "Successfully logged out"}
+    return {
+        "message": "Successfully logged out"
+        }
 
 
 @router.get("/me", response_model=UserResponse, summary="Get Current User")
