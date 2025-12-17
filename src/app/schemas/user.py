@@ -74,12 +74,6 @@ class UserResponse(BaseResponseSchema):
     username: str = Field(..., description="Username")
     full_name: Optional[str] = Field(None, description="Full name")
     is_active: bool = Field(..., description="Whether user is active")
-    is_verified: bool = Field(..., description="Whether user is verified")
-    is_superuser: bool = Field(..., description="Whether user is superuser")
-    last_login: Optional[datetime] = Field(None, description="Last login timestamp")
-    created_at: datetime = Field(..., description="User creation timestamp")
-    updated_at: datetime = Field(..., description="User last update timestamp")
-    
     
 
 class UserProfile(UserResponse):
