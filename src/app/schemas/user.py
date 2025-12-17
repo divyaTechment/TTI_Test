@@ -76,12 +76,6 @@ class UserResponse(BaseResponseSchema):
     is_active: bool = Field(..., description="Whether user is active")
     
 
-class UserProfile(UserResponse):
-    """Schema for user profile (includes sensitive information)."""
-    
-    pass
-
-
 class PasswordChange(BaseModel):
     """Schema for password change."""
     
