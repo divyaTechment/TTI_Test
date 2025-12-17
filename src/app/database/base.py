@@ -42,6 +42,15 @@ def get_db() -> Generator:
 def create_tables():
     """Create all database tables."""
     bind=engine
+    print("Creating tables...")
     Base.metadata.create_all(bind=bind)
 
 
+def drop_tables():
+    """Drop all database tables."""
+    bind=engine
+    Base.metadata.drop_all(bind=bind)
+
+
+
+    
