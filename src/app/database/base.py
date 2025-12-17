@@ -31,10 +31,12 @@ def get_db() -> Generator:
         Generator: Database session
     """
     db = SessionLocal()
+    db.autobegin()
     try:
         yield db
     finally:
         db.close()
+    
 
 
 def create_tables():
@@ -47,4 +49,7 @@ def drop_tables():
     """Drop all database tables."""
     Base.metadata.drop_all(bind=engine)
 
-
+def reset_database():
+    """Drop and recreate all database tables."""
+    drop_tables()
+    create_tables()
