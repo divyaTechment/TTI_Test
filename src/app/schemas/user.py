@@ -79,7 +79,8 @@ class UserResponse(BaseResponseSchema):
     last_login: Optional[datetime] = Field(None, description="Last login timestamp")
     created_at: datetime = Field(..., description="User creation timestamp")
     updated_at: datetime = Field(..., description="User last update timestamp")
-
+    created_by: Optional[int] = Field(None, description="ID of the user who created this user")
+    updated_by: Optional[int] = Field(None, description="ID of the user who last updated this user")
 
 class UserProfile(UserResponse):
     """Schema for user profile (includes sensitive information)."""
