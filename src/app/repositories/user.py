@@ -39,6 +39,18 @@ class UserRepository(BaseRepository[User]):
         """
         return self.db.query(User).filter(User.username == username).first()
     
+    def get_by_username_email(self, username: str) -> Optional[User]:
+        """
+        Get user by username.
+        
+        Args:
+            username: Username
+            
+        Returns:
+            User instance or None
+        """
+        return self.db.query(User).filter(User.username == username).first()
+    
     def get_active_users(self, skip: int = 0, limit: int = 100) -> List[User]:
         """
         Get active users.
