@@ -23,10 +23,6 @@ class TimestampSchema(BaseSchema):
     updated_at: datetime = Field(..., description="Last update timestamp")
 
 
-class IDSchema(BaseSchema):
-    """Schema with ID field."""
-    
-    id: int = Field(..., description="Unique identifier")
 
 
 class PaginationSchema(BaseSchema):
