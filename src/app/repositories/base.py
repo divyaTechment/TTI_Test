@@ -36,7 +36,7 @@ class BaseRepository(Generic[ModelType]):
         """
         return self.db.query(self.model).filter(self.model.id == id).first()
     
-    def getTest(self, id: int) -> Optional[ModelType]:
+    def getTesting(self, id: int) -> Optional[ModelType]:
         """
         Get a single record by ID.
         
@@ -46,6 +46,7 @@ class BaseRepository(Generic[ModelType]):
         Returns:
             Model instance or None
         """
+        var=56
         return self.db.query(self.model).filter(self.model.id == id).first()
     
     
