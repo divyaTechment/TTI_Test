@@ -87,6 +87,8 @@ class BaseRepository(Generic[ModelType]):
         # Apply ordering
         if order_by and hasattr(self.model, order_by):
             query = query.order_by(getattr(self.model, order_by))
+        else:
+            query = query.order_by(self.model.id)
         
         return query.offset(skip).limit(limit).all()
     
