@@ -79,7 +79,6 @@ class BaseRepository(Generic[ModelType]):
                         query = query.filter(getattr(self.model, field).in_(value))
                 elif field == "and":
                     query = query.filter(and_(*[getattr(self.model, k) == v for k, v in value.items()]))
-                elif field == "or":
                     query = query.filter(or_(*[getattr(self.model, k) == v for k, v in value.items()]))
                 else:
                     query = query.filter(getattr(self.model, field) == value)
@@ -87,8 +86,7 @@ class BaseRepository(Generic[ModelType]):
         # Apply ordering
         if order_by and hasattr(self.model, order_by):
             query = query.order_by(getattr(self.model, order_by))
-        else:
-            query = query.order_by(self.model.id)
+        
         
         return query.offset(skip).limit(limit).all()
     
