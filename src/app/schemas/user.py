@@ -103,9 +103,3 @@ class Token(BaseModel):
     token_type: str = Field("bearer", description="Token type")
     expires_in: int = Field(..., description="Token expiration time in seconds")
 
-
-class TokenData(BaseModel):
-    """Schema for token data."""
-    
-    user_id: Optional[int] = None
-    email: Optional[str] = None
