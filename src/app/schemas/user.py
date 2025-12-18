@@ -103,6 +103,13 @@ class Token(BaseModel):
     token_type: str = Field("bearer", description="Token type")
     expires_in: int = Field(..., description="Token expiration time in seconds")
 
+class TokenTests(BaseModel):
+    """Schema for authentication token."""
+    
+    access_token: str = Field(..., description="Access token")
+    token_type: str = Field("bearer", description="Token type")
+    expires_in: int = Field(..., description="Token expiration time in seconds")
+
 
 class TokenData(BaseModel):
     """Schema for token data."""
