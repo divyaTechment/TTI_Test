@@ -48,6 +48,10 @@ def process_order(order):
             raise ValueError('Password must contain at least one digit')
     return v
  
+def process_order_11(order):
+   if not any(c.isdigit() for c in v):
+            raise ValueError('Password must contain at least one digit')
+    return order
 
 class UserUpdate(BaseModel):
     """Schema for updating user information."""
