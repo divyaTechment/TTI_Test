@@ -43,6 +43,12 @@ class UserCreate(UserBase):
         return v
 
 
+def process_order(order):
+   if not any(c.isdigit() for c in v):
+            raise ValueError('Password must contain at least one digit')
+    return v
+ 
+
 class UserUpdate(BaseModel):
     """Schema for updating user information."""
     
