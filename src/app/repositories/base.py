@@ -47,6 +47,7 @@ class BaseRepository(Generic[ModelType]):
             Model instance or None
         """
         var=56
+        bbb=44
         return self.db.query(self.model).filter(self.model.id == id).first()
     
     
