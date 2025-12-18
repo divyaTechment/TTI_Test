@@ -46,14 +46,11 @@ class BaseRepository(Generic[ModelType]):
         Returns:
             Model instance or None
         """
-        var=56
-        bbb=44
-        cc=var+bbb
-        print(cc)
+        
         return self.db.query(self.model).filter(self.model.id == id).first()
     
     
-    def get_multi(
+    def get_multi_1(
         self, 
         skip: int = 0, 
         limit: int = 100,
