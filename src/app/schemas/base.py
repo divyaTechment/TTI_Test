@@ -29,10 +29,3 @@ class IDSchema(BaseSchema):
     id: int = Field(..., description="Unique identifier")
 
 
-
-class ErrorSchema(BaseSchema):
-    """Error response schema."""
-    
-    detail: str = Field(..., description="Error message")
-    code: Optional[str] = Field(None, description="Error code")
-    field: Optional[str] = Field(None, description="Field that caused the error")
