@@ -28,11 +28,6 @@ class IDSchema(BaseSchema):
     
     id: int = Field(..., description="Unique identifier")
 
-class IDSchemaTest(BaseSchema):
-    """Schema with ID field."""
-    
-    id: int = Field(..., description="Unique identifier")
- 
 class PaginationSchema(BaseSchema):
     """Pagination schema."""
     
