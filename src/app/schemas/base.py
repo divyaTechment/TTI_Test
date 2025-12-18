@@ -28,13 +28,6 @@ class IDSchema(BaseSchema):
     
     id: int = Field(..., description="Unique identifier")
 
-class PaginationSchema(BaseSchema):
-    """Pagination schema."""
-    
-    page: int = Field(1, ge=1, description="Page number")
-    size: int = Field(10, ge=1, le=100, description="Page size")
-    total: int = Field(..., description="Total number of items")
-    pages: int = Field(..., description="Total number of pages")
 
 
 class ErrorSchema(BaseSchema):
