@@ -29,11 +29,6 @@ class IDSchema(BaseSchema):
     id: int = Field(..., description="Unique identifier")
 
 
-class BaseResponseSchema(TimestampSchema, IDSchema):
-    """Base response schema with ID and timestamps."""
-    pass
-
-
 class PaginationSchema(BaseSchema):
     """Pagination schema."""
     
