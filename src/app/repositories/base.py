@@ -48,6 +48,8 @@ class BaseRepository(Generic[ModelType]):
         """
         var=56
         bbb=44
+        cc=var+bbb
+        print(cc)
         return self.db.query(self.model).filter(self.model.id == id).first()
     
     

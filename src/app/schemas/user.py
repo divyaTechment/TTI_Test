@@ -68,7 +68,6 @@ class UserLogin(BaseModel):
     """Schema for user login."""
     
     email: EmailStr = Field(..., description="User email address")
-    phone: EmailStr = Field(..., description="User phone number")
     password: str = Field(..., description="User password")
 
 class UserResponse(BaseResponseSchema):
