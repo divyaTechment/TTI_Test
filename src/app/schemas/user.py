@@ -15,7 +15,7 @@ class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50, description="Username")
     full_name: Optional[str] = Field(None, max_length=255, description="Full name")
     first_name: Optional[str] = Field(None, max_length=100, description="First name")
-    last_name: Optional[str] = Field(None, max_length=100, description="Last
+    last_name: Optional[str] = Field(None, max_length=100, description="Last name")
     is_active: bool = Field(True, description="Whether user is active")
     is_superuser: bool = Field(False, description="Whether user is a superuser")
     is_verified: bool = Field(False, description="Whether user is verified")
