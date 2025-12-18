@@ -40,6 +40,8 @@ class PaginationSchema(BaseSchema):
     size: int = Field(10, ge=1, le=100, description="Page size")
     total: int = Field(..., description="Total number of items")
     pages: int = Field(..., description="Total number of pages")
+    pagescount: int = Field(..., description="Total number of pages")
+    pagesize: int = Field(..., description="Number of items per page")
 
 
 class ErrorSchema(BaseSchema):
