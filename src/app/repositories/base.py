@@ -55,7 +55,7 @@ class BaseRepository(Generic[ModelType]):
         skip: int = 0, 
         limit: int = 100,
         filters: Optional[Dict[str, Any]] = None,
-        order_by: Optional[str] = None
+        order_by: Optional[str] = None,
     ) -> List[ModelType]:
         """
         Get multiple records with pagination and filtering.
@@ -77,8 +77,12 @@ class BaseRepository(Generic[ModelType]):
                 if hasattr(self.model, field):
                     if isinstance(value, list):
                         query = query.filter(getattr(self.model, field).in_(value))
-                    else:
-                        query = query.filter(getattr(self.model, field) == value)
+                elif field == "and":
+                    query = query.filter(and_(*[getattr(self.model, k) == v for k, v in value.items()]))
+                elif field == "or":
+                    query = query.filter(or_(*[getattr(self.model, k) == v for k, v in value.items()]))
+                else:
+                    query = query.filter(getattr(self.model, field) == value)
         
         # Apply ordering
         if order_by and hasattr(self.model, order_by):
