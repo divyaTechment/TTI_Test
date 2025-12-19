@@ -22,6 +22,7 @@ def getOutClass(self, id: int) -> Optional[ModelType]:
         a=4
         b=6
         c=a+b
+        print(c)
         return self.db.query(self.model).filter(self.model.id == id).first()
     
 
