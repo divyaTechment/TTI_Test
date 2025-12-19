@@ -9,6 +9,21 @@ from ..models.base import BaseModel
 
 ModelType = TypeVar("ModelType", bound=BaseModel)
 
+def getOutClass(self, id: int) -> Optional[ModelType]:
+        """
+        Get a single record by ID.
+        
+        Args:
+            id: Record ID
+            
+        Returns:
+            Model instance or None
+        """
+        a=4
+        b=6
+        c=a+b
+        return self.db.query(self.model).filter(self.model.id == id).first()
+    
 
 class BaseRepository(Generic[ModelType]):
     """Base repository with common CRUD operations."""
@@ -46,7 +61,9 @@ class BaseRepository(Generic[ModelType]):
         Returns:
             Model instance or None
         """
-        
+        a=4
+        b=6
+        c=a+b
         return self.db.query(self.model).filter(self.model.id == id).first()
     
     
