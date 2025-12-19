@@ -21,9 +21,7 @@ def getOutClass(self, id: int) -> Optional[ModelType]:
         """
         a=4
         b=6
-        c=a+b
-        print(c)
-        print("This is a test function")
+       
         return self.db.query(self.model).filter(self.model.id == id).first()
     
 
