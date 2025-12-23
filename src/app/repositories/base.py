@@ -33,7 +33,9 @@ class BaseRepository(Generic[ModelType]):
         Args:
             model: SQLAlchemy model class
             db: Database session
+            TST-114
         """
+        print("Initializing BaseRepository")
         self.model = model
         self.db = db
     
