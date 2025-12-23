@@ -18,10 +18,8 @@ def getOutClass(self, id: int) -> Optional[ModelType]:
             
         Returns:
             Model instance or None
+            TST-111
         """
-        a=4
-        b=6
-        c=a+b
         return self.db.query(self.model).filter(self.model.id == id).first()
     
 
