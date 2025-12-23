@@ -18,7 +18,7 @@ def getOutClass(self, id: int) -> Optional[ModelType]:
             
         Returns:
             Model instance or None
-            TST-111
+            TST-114
         """
         return self.db.query(self.model).filter(self.model.id == id).first()
     
