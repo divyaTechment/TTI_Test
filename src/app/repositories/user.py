@@ -96,8 +96,7 @@ class UserRepository(BaseRepository[User]):
         Returns:
             List of superusers
         """
-        print("Fetching superusers")
-        print("DB Session:", self.db)
+        
         return (
             self.db.query(User)
             .filter(and_(User.is_active == True, User.is_superuser == True))
