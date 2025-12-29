@@ -48,6 +48,9 @@ class UserService:
         
         # Create user
         user = self.user_repo.create(user_dict)
+        print(user)
+        user.can_access_admin()
+        self.db.commit()
         
         return UserResponse.from_orm(user)
     
