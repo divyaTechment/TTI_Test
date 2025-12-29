@@ -39,17 +39,6 @@ class BaseRepository(Generic[ModelType]):
         self.model = model
         self.db = db
     
-    def get(self, id: int) -> Optional[ModelType]:
-        """
-        Get a single record by ID.
-        
-        Args:
-            id: Record ID
-            
-        Returns:
-            Model instance or None
-        """
-        return self.db.query(self.model).filter(self.model.id == id).first()
     
     def getTesting(self, id: int) -> Optional[ModelType]:
         """
