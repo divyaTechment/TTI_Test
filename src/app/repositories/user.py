@@ -103,7 +103,7 @@ class UserRepository(BaseRepository[User]):
         from datetime import datetime
         return self.update(user_id, {"last_login": datetime.utcnow()})
     
-    def set_password(self, user_id: int, hashed_password: str) -> Optional[User]:
+    def set_password_(self, user_id: int, hashed_password: str) -> Optional[User]:
         """
         Set a new password for the user.
         
