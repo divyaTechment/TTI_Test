@@ -103,6 +103,17 @@ class UserRepository(BaseRepository[User]):
         from datetime import datetime
         return self.update(user_id, {"last_login": datetime.utcnow()})
     
+    def set_password(self, user_id: int, hashed_password: str) -> Optional[User]:
+        """
+        Set a new password for the user.
+        
+        Args:
+            user_id: User ID
+            hashed_password: New hashed password
+        """
+        return self.update(user_id, {"hashed_password": hashed_password})
+
+    
     def deactivate_user(self, user_id: int) -> Optional[User]:
         """
         Deactivate a user.
