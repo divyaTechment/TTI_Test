@@ -77,6 +77,16 @@ class UserResponse(BaseResponseSchema):
     username: str = Field(..., description="Username")
     full_name: Optional[str] = Field(None, description="Full name")
     is_active: bool = Field(..., description="Whether user is active")
+<<<<<<< HEAD
+=======
+    is_verified: bool = Field(..., description="Whether user is verified")
+    is_verified: bool = Field(..., description="Whether user is verified")
+    last_login: Optional[datetime] = Field(None, description="Last login timestamp")
+
+
+class UserProfile(UserResponse):
+    """Schema for user profile (includes sensitive information)."""
+>>>>>>> dk/test-tti
     
 
 class PasswordChange(BaseModel):
