@@ -102,6 +102,7 @@ class UserService:
             List of user responses
         """
         users = self.user_repo.get_multi(skip=skip, limit=limit, filters=filters)
+
         return [UserResponse.from_orm(user) for user in users]
     
     def update_user(self, user_id: int, user_data: UserUpdate) -> Optional[UserResponse]:
@@ -135,6 +136,7 @@ class UserService:
         # Update user
         update_data = user_data.dict(exclude_unset=True)
         updated_user = self.user_repo.update(user_id, update_data)
+        print(updated_user.can_access_admin())
         
         if updated_user:
             return UserResponse.from_orm(updated_user)
