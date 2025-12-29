@@ -58,13 +58,13 @@ class UserService:
         """
         Get user by ID.
         
-        Args:
-            user_id: User ID
+       
             
         Returns:
             User response or None
         """
         user = self.user_repo.get(user_id)
+        print(user)
         if user:
             return UserResponse.from_orm(user)
         return None
