@@ -202,6 +202,7 @@ async def update_user(
         HTTPException: If user not found or update fails
     """
     user_service = UserService(db)
+    user_data = user_data.copy()
     
     try:
         updated_user = user_service.update_user(user_id, user_data)
