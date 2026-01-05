@@ -1,0 +1,36 @@
+name: Python CI with Datadog TIA
+
+on:
+  push:
+    branches:
+      - datadog-tia-python-demo
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run tests with Datadog ITR
+        env:
+          DD_API_KEY: ${{ secrets.DD_API_KEY }}
+          DD_APP_KEY: ${{ secrets.DD_APP_KEY }}
+          DD_SITE: us5.datadoghq.com
+          DD_SERVICE: python-tia-demo
+          DD_ENV: ci
+          DD_CIVISIBILITY_ENABLED: "true"
+          DD_TEST_IMPACT_ANALYSIS_ENABLED: "true"
+        run: |
+          ddtrace-run pytest
