@@ -126,6 +126,12 @@ async def get_user(
             detail="Not enough permissions"
         )
     
+    if not current_user.is_superuser and not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive users cannot access other user profiles"
+        )
+    
     user = user_service.get_user(user_id)
     if not user:
         raise HTTPException(

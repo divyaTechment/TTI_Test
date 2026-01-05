@@ -10,7 +10,7 @@ class BaseSchema(BaseModel):
     """Base schema with common fields."""
     
     class Config:
-        from_attributes = True
+        orm_mode = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -32,6 +32,13 @@ class IDSchemaTest(BaseSchema):
     """Schema with ID field."""
     
     id: int = Field(..., description="Unique identifier")
+ 
+class BaseResponseSchema(BaseSchema):
+    """Base response schema with ID and optional timestamps for responses."""
+
+    id: int = Field(..., description="Unique identifier")
+    created_at: Optional[datetime] = Field(None, description="Creation timestamp")
+    updated_at: Optional[datetime] = Field(None, description="Last update timestamp")
  
 class PaginationSchema(BaseSchema):
     """Pagination schema."""
