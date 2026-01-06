@@ -1,0 +1,37 @@
+name: Python CI with Datadog TIA
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      # 🔹 Datadog Test Optimization (CI Visibility + TIA)
+      - name: Configure Datadog Test Optimization
+        uses: datadog/test-visibility-github-action@v2
+        with:
+          languages: python
+          api_key: ${{secrets.DD_API_KEY}}
+          site: us5.datadoghq.com
+
+      # 🔹 Run tests (Datadog auto-instruments pytest)
+      - name: Run tests
+        shell: bash
+        run: pytest
