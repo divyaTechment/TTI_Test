@@ -13,4 +13,5 @@ def add(a: Number, b: Number) -> Number:
 
 def subtract(a: Number, b: Number) -> Number:
     """Return the difference of two numbers (a - b)."""
+    print("Subtracting {} - {}".format(a, b))
     return a - b
