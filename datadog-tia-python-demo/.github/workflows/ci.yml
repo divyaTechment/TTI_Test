@@ -3,6 +3,7 @@ name: Python CI with Datadog TIA
 on:
   push:
     branches:
+      - main
       - datadog-tia-python-demo
   pull_request:
 
@@ -15,21 +16,24 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest
 
-      - name: Run tests with Datadog ITR
-        env:
-          DD_API_KEY: ${{ secrets.DD_API_KEY }}
-          DD_SITE: us5.datadoghq.com
-          DD_SERVICE: python-tia-demo
-          DD_ENV: ci
-          DD_CIVISIBILITY_ENABLED: "true"
-          DD_TEST_IMPACT_ANALYSIS_ENABLED: "true"
-        run: |
-          ddtrace-run pytest
+      # 🔹 Datadog Test Optimization (CI Visibility + TIA)
+      - name: Configure Datadog Test Optimization
+        uses: datadog/test-visibility-github-action@v2
+        with:
+          languages: python
+          api_key: ${{ secrets.DD_API_KEY }}
+          site: us5.datadoghq.com
+
+      # 🔹 Run tests (Datadog auto-instruments pytest)
+      - name: Run tests
+        run: pytest
