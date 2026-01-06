@@ -30,6 +30,7 @@ jobs:
           languages: python
           api_key: ${{secrets.DD_API_KEY}}
           site: us5.datadoghq.com
+          itr_enabled: true 
 
       # 🔹 Run tests (Datadog auto-instruments pytest)
       - name: Run tests
