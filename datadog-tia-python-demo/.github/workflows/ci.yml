@@ -31,9 +31,10 @@ jobs:
         uses: datadog/test-visibility-github-action@v2
         with:
           languages: python
-          api_key: ${{ secrets.DD_API_KEY }}
+          api_key: ${{secrets.DD_API_KEY}}
           site: us5.datadoghq.com
 
       # 🔹 Run tests (Datadog auto-instruments pytest)
       - name: Run tests
+        shell: bash
         run: pytest
