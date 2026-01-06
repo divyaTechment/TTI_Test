@@ -78,17 +78,17 @@ def get_changed_methods(changed_files):
             for method in methods:
                 # Check if method definition appears in diff
                 if f"def {method}" in diff_content:
-                    # Format: app/calculator.add
-                    method_path = f"{module_path}.{method}"
+                    # Format: app/calculator.add (with slash, not dot)
+                    # This matches the @pytest.mark.impact("app/calculator.add") format
+                    method_path = f"{file_path.replace('.py', '').replace('\\', '/')}.{method}"
                     changed_methods.append(method_path)
         except subprocess.CalledProcessError:
             # If we can't get diff, include all methods from changed file
             for method in methods:
-                method_path = f"{module_path}.{method}"
+                method_path = f"{file_path.replace('.py', '').replace('\\', '/')}.{method}"
                 changed_methods.append(method_path)
     
     return changed_methods
-
 
 def main():
     """Main function to detect and output changed methods."""

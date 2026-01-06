@@ -79,25 +79,43 @@ jobs:
         shell: bash
         run: |
           echo "🚀 Running impacted tests with Datadog TIA..."
+          echo "📊 Datadog Test Impact Analysis is enabled"
           
           CHANGED_METHODS="${{ steps.changed-methods.outputs.methods }}"
           
           if [ -n "$CHANGED_METHODS" ]; then
-            echo "🎯 Running tests for changed methods: $CHANGED_METHODS"
-            pytest -v \
+            echo "📝 Changed methods detected: $CHANGED_METHODS"
+            echo "🔍 Running only tests impacted by these methods..."
+            echo "   (Tests with @pytest.mark.impact matching these methods will run)"
+            echo ""
+            
+            # Use pytest --ddtrace (Datadog's recommended method per documentation)
+            # The script already outputs format: app/calculator.add which matches test markers
+            pytest --ddtrace -v \
               --changed-methods="$CHANGED_METHODS" \
               --html=report.html \
               --self-contained-html \
               --junitxml=test-results.xml
+            
+            echo ""
+            echo "✅ Impacted tests completed! Only tests for changed methods were run."
           else
             echo "📊 No specific methods changed, running all tests..."
-            pytest -v \
+            echo "ℹ️  This will help Datadog build coverage data for future test optimization"
+            echo ""
+            
+            # Use pytest --ddtrace (Datadog's recommended method per documentation)
+            pytest --ddtrace -v \
               --html=report.html \
               --self-contained-html \
               --junitxml=test-results.xml
+            
+            echo ""
+            echo "✅ All tests completed! Results sent to Datadog."
           fi
           
-          echo "✅ Tests completed! Results sent to Datadog."
+          echo ""
+          echo "📈 View test optimization metrics in Datadog dashboard"
 
       - name: Upload test report
         if: always()
@@ -120,12 +138,20 @@ jobs:
         run: |
           echo "## 🎯 Impacted Test Results (Method-Level)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Changed Methods:" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.changed-methods.outputs.methods }}" >> $GITHUB_STEP_SUMMARY
-          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "### Changed Methods Detected:" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ steps.changed-methods.outputs.methods }}" ]; then
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.changed-methods.outputs.methods }}" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Only tests for these methods were run**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️  No specific methods changed - all tests were run" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### View in Datadog:" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 View in Datadog:" >> $GITHUB_STEP_SUMMARY
           echo "- **Test Runs**: https://app.us5.datadoghq.com/ci/test-runs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Optimization Dashboard**: https://app.us5.datadoghq.com/ci/test-runs?view=test_optimization" >> $GITHUB_STEP_SUMMARY
           echo "- **Flaky Tests**: https://app.us5.datadoghq.com/ci/flaky-tests" >> $GITHUB_STEP_SUMMARY
-          echo "- **Service**: tti-calculator | **Environment**: ci" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Service**: tti-calculator | **Environment**: ci | **Site**: us5.datadoghq.com" >> $GITHUB_STEP_SUMMARY
