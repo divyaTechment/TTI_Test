@@ -33,4 +33,5 @@ def divide(a: Number, b: Number) -> Number:
 
 def power(a: Number, b: Number) -> Number:
     """Return a raised to the power of b."""
-    return a ** b
+    p = a ** b
+    return p
