@@ -3,6 +3,7 @@ def main():
 	print("Hello!! testing file...")
 	print("Hello!! Creating a new file...")
 	print("Hello!! Inserting into Database ...")
+	print("Hello!! Testing file completed.")
 
 
 
