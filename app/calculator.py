@@ -14,7 +14,9 @@ def add(a: Number, b: Number) -> Number:
 
 def subtract(a: Number, b: Number) -> Number:
     """Return the difference of two numbers (a - b)."""
-    return a - b
+    c =  a - b
+
+    return c
 
 
 def multiply(a: Number, b: Number) -> Number:
