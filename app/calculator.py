@@ -8,8 +8,8 @@ Number = Union[int, float]
 
 def add(a: Number, b: Number) -> Number:
     """Return the sum of two numbers."""
-    print("test")
-    return a + b
+    c = a + b
+    return c
 
 
 def subtract(a: Number, b: Number) -> Number:
