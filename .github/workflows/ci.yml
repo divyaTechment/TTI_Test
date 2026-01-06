@@ -6,22 +6,40 @@ on:
 
 jobs:
   test:
+    name: Run Impacted Tests (Method-Level)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for git diff to detect changed methods
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install ddtrace
+
+      # 🔹 Detect changed methods from git diff
+      - name: Detect changed methods
+        id: changed-methods
+        run: |
+          python .github/scripts/detect_changed_methods.py > changed_methods.txt || echo "" > changed_methods.txt
+          CHANGED_METHODS=$(cat changed_methods.txt)
+          if [ -n "$CHANGED_METHODS" ]; then
+            echo "methods=$CHANGED_METHODS" >> $GITHUB_OUTPUT
+            echo "📝 Changed methods detected: $CHANGED_METHODS"
+          else
+            echo "methods=" >> $GITHUB_OUTPUT
+            echo "ℹ️  No specific methods changed, will run all tests"
+          fi
 
       # 🔹 Datadog Test Optimization (CI Visibility + TIA)
       - name: Configure Datadog Test Optimization
@@ -30,9 +48,84 @@ jobs:
           languages: python
           api_key: ${{secrets.DD_API_KEY}}
           site: us5.datadoghq.com
-          itr_enabled: true 
+          itr_enabled: true
 
-      # 🔹 Run tests (Datadog auto-instruments pytest)
-      - name: Run tests
+      # 🔹 Run only impacted tests based on changed methods
+      - name: Run impacted tests
+        env:
+          # Datadog CI Visibility Configuration
+          DD_ENV: ci
+          DD_SERVICE: tti-calculator
+          DD_SITE: us5.datadoghq.com
+          
+          # Enable Test Impact Analysis (ITR)
+          DD_CIVISIBILITY_ITR_ENABLED: "true"
+          DD_CIVISIBILITY_AGENTLESS_ENABLED: "true"
+          
+          # Git metadata
+          DD_GIT_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+          DD_GIT_COMMIT_SHA: ${{ github.sha }}
+          DD_GIT_BRANCH: ${{ github.ref_name }}
+          DD_GIT_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          DD_GIT_COMMIT_AUTHOR_NAME: ${{ github.event.head_commit.author.name }}
+          DD_GIT_COMMIT_AUTHOR_EMAIL: ${{ github.event.head_commit.author.email }}
+          
+          # Pipeline metadata
+          DD_CI_PIPELINE_ID: ${{ github.run_id }}
+          DD_CI_PIPELINE_NAME: ${{ github.workflow }}
+          DD_CI_PIPELINE_NUMBER: ${{ github.run_number }}
+          DD_CI_JOB_NAME: test
+          DD_CI_JOB_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         shell: bash
-        run: pytest
+        run: |
+          echo "🚀 Running impacted tests with Datadog TIA..."
+          
+          CHANGED_METHODS="${{ steps.changed-methods.outputs.methods }}"
+          
+          if [ -n "$CHANGED_METHODS" ]; then
+            echo "🎯 Running tests for changed methods: $CHANGED_METHODS"
+            pytest -v \
+              --changed-methods="$CHANGED_METHODS" \
+              --html=report.html \
+              --self-contained-html \
+              --junitxml=test-results.xml
+          else
+            echo "📊 No specific methods changed, running all tests..."
+            pytest -v \
+              --html=report.html \
+              --self-contained-html \
+              --junitxml=test-results.xml
+          fi
+          
+          echo "✅ Tests completed! Results sent to Datadog."
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-html-report
+          path: report.html
+          retention-days: 30
+
+      - name: Upload test results XML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-xml-results
+          path: test-results.xml
+          retention-days: 30
+
+      - name: Display results
+        if: always()
+        run: |
+          echo "## 🎯 Impacted Test Results (Method-Level)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Changed Methods:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.changed-methods.outputs.methods }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### View in Datadog:" >> $GITHUB_STEP_SUMMARY
+          echo "- **Test Runs**: https://app.us5.datadoghq.com/ci/test-runs" >> $GITHUB_STEP_SUMMARY
+          echo "- **Flaky Tests**: https://app.us5.datadoghq.com/ci/flaky-tests" >> $GITHUB_STEP_SUMMARY
+          echo "- **Service**: tti-calculator | **Environment**: ci" >> $GITHUB_STEP_SUMMARY

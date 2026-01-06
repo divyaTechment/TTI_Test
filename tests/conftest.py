@@ -17,7 +17,13 @@ def pytest_addoption(parser):
         "--changed-files",
         action="store",
         default="",
-        help="Comma-separated list of changed files (simulates git changes for test selection)",
+        help="Comma-separated list of changed files or methods (e.g., 'app/calculator.py,app/calculator.add')",
+    )
+    parser.addoption(
+        "--changed-methods",
+        action="store",
+        default="",
+        help="Comma-separated list of changed methods (e.g., 'app/calculator.add,app/calculator.subtract')",
     )
     parser.addoption(
         "--run-flaky",
@@ -69,21 +75,45 @@ def _collect_marker_files(marker) -> List[str]:
 
 
 def _matches_changed(impacted_files: List[str], changed_files: List[str]) -> bool:
-    """Check if any impacted file matches changed files."""
+    """Check if any impacted file or method matches changed files/methods."""
     for cf in changed_files:
         for imp in impacted_files:
-            # Loose matching: check substrings and suffixes
-            if imp in cf or cf.endswith(imp) or cf == imp:
+            # Method-level matching: e.g., "app/calculator.add" matches "app/calculator.add" or "app/calculator.py" with add method
+            if imp == cf:
                 return True
+            # File-level matching: check if changed file path matches impact marker
+            if imp in cf or cf.endswith(imp):
+                return True
+            # Method-level matching: if impact is "app/calculator.add" and changed is "app/calculator.add" or contains ".add"
+            if "." in imp and "." in cf:
+                # Extract method name from impact (e.g., "app/calculator.add" -> "add")
+                imp_parts = imp.split(".")
+                cf_parts = cf.split(".")
+                if len(imp_parts) > 1 and len(cf_parts) > 1:
+                    imp_method = imp_parts[-1]
+                    cf_method = cf_parts[-1]
+                    # Check if file path matches and method name matches
+                    imp_file = ".".join(imp_parts[:-1])
+                    cf_file = ".".join(cf_parts[:-1])
+                    if imp_file in cf_file or cf_file.endswith(imp_file.replace("/", ".")):
+                        if imp_method == cf_method:
+                            return True
     return False
 
 
 def pytest_collection_modifyitems(config, items):
-    """Modify test collection based on changed files and custom options."""
-    # Handle changed files filtering for test optimization
+    """Modify test collection based on changed files/methods and custom options."""
+    # Combine changed files and changed methods
     changed_files_opt = config.getoption("--changed-files")
+    changed_methods_opt = config.getoption("--changed-methods")
+    
+    changed = []
     if changed_files_opt:
-        changed = [p.strip() for p in changed_files_opt.split(",") if p.strip()]
+        changed.extend([p.strip() for p in changed_files_opt.split(",") if p.strip()])
+    if changed_methods_opt:
+        changed.extend([p.strip() for p in changed_methods_opt.split(",") if p.strip()])
+    
+    if changed:
         impacted_items = []
         deselected = []
 
@@ -103,7 +133,8 @@ def pytest_collection_modifyitems(config, items):
             for d in deselected:
                 items.remove(d)
             config.hook.pytest_deselected(items=deselected)
-            print(f"\n[Test Optimization] Selected {len(impacted_items)} impacted tests based on changed files: {changed}")
+            print(f"\n[Test Optimization] Selected {len(impacted_items)} impacted tests based on changed files/methods: {changed}")
+            print(f"[Test Optimization] Deselected {len(deselected)} non-impacted tests")
 
     # Handle flaky test filtering
     if not config.getoption("--run-flaky"):
