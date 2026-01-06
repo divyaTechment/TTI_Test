@@ -21,8 +21,8 @@ def subtract(a: Number, b: Number) -> Number:
 
 def multiply(a: Number, b: Number) -> Number:
     """Return the product of two numbers."""
-    m = a * b
-    return m
+    # m = a * b
+    return a * b
 
 
 def divide(a: Number, b: Number) -> Number:
