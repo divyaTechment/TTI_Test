@@ -58,13 +58,13 @@ def get_changed_methods(changed_files):
         if not file_path.endswith('.py'):
             continue
         
-        # Convert to module path format (e.g., app/calculator.py -> app/calculator)
-        module_path = file_path.replace('.py', '').replace('/', '.').replace('\\', '.')
-        
         # Extract methods from the file
         methods = extract_methods_from_file(file_path)
         
-        # Also check git diff to see which specific methods changed
+        if not methods:
+            continue
+        
+        # Check git diff to see which specific methods changed
         try:
             result = subprocess.run(
                 ["git", "diff", "HEAD~1", "HEAD", "--", file_path],
@@ -74,14 +74,41 @@ def get_changed_methods(changed_files):
             )
             diff_content = result.stdout
             
+            if not diff_content.strip():
+                # No diff found, try comparing with origin
+                try:
+                    result = subprocess.run(
+                        ["git", "diff", "origin/main...HEAD", "--", file_path],
+                        capture_output=True,
+                        text=True,
+                        check=True
+                    )
+                    diff_content = result.stdout
+                except subprocess.CalledProcessError:
+                    diff_content = ""
+            
             # Find methods that appear in the diff (added/modified lines)
+            detected_methods = []
             for method in methods:
-                # Check if method definition appears in diff
-                if f"def {method}" in diff_content:
+                # Check if method definition appears in diff (look for def method_name)
+                # Also check for method body changes (lines inside the method)
+                method_pattern = rf'def\s+{method}\s*\('
+                if re.search(method_pattern, diff_content):
                     # Format: app/calculator.add (with slash, not dot)
                     # This matches the @pytest.mark.impact("app/calculator.add") format
                     method_path = f"{file_path.replace('.py', '').replace('\\', '/')}.{method}"
+                    detected_methods.append(method_path)
+            
+            if detected_methods:
+                # Specific methods detected
+                changed_methods.extend(detected_methods)
+            else:
+                # No specific methods detected, include all methods from changed file
+                # This ensures tests run when file is changed but we can't detect specific methods
+                for method in methods:
+                    method_path = f"{file_path.replace('.py', '').replace('\\', '/')}.{method}"
                     changed_methods.append(method_path)
+                    
         except subprocess.CalledProcessError:
             # If we can't get diff, include all methods from changed file
             for method in methods:
@@ -109,10 +136,16 @@ def main():
     
     # Output comma-separated list of changed methods
     if changed_methods:
-        print(",".join(changed_methods))
+        # Remove duplicates and sort
+        unique_methods = sorted(list(set(changed_methods)))
+        output = ",".join(unique_methods)
+        print(output, end="")
+        # Debug output to stderr (won't affect the output)
+        print(f"DEBUG: Detected {len(unique_methods)} changed methods: {output}", file=sys.stderr)
     else:
-        # If no specific methods detected, output file paths
-        print(",".join([f.replace('.py', '').replace('/', '.') for f in app_files]))
+        # If no methods found at all, output empty (will run all tests)
+        print("", end="")
+        print("DEBUG: No methods detected, will run all tests", file=sys.stderr)
 
 
 if __name__ == "__main__":

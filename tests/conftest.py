@@ -77,27 +77,66 @@ def _collect_marker_files(marker) -> List[str]:
 def _matches_changed(impacted_files: List[str], changed_files: List[str]) -> bool:
     """Check if any impacted file or method matches changed files/methods."""
     for cf in changed_files:
+        # Normalize changed file/method format
+        # Convert app.calculator -> app/calculator for matching
+        if "." in cf and "/" not in cf:
+            # Format: app.calculator or app.calculator.add
+            cf_normalized = cf.replace(".", "/", 1)  # Only replace first dot
+            if "." in cf_normalized:
+                # Has method: app/calculator.add
+                cf_parts = cf_normalized.split(".", 1)
+                cf_file_norm = cf_parts[0]  # app/calculator
+                cf_method = cf_parts[1] if len(cf_parts) > 1 else None
+            else:
+                # File only: app/calculator
+                cf_file_norm = cf_normalized
+                cf_method = None
+        else:
+            # Already in app/calculator format
+            if "." in cf:
+                cf_parts = cf.split(".", 1)
+                cf_file_norm = cf_parts[0]
+                cf_method = cf_parts[1] if len(cf_parts) > 1 else None
+            else:
+                cf_file_norm = cf
+                cf_method = None
+        
         for imp in impacted_files:
-            # Method-level matching: e.g., "app/calculator.add" matches "app/calculator.add" or "app/calculator.py" with add method
-            if imp == cf:
-                return True
-            # File-level matching: check if changed file path matches impact marker
-            if imp in cf or cf.endswith(imp):
-                return True
-            # Method-level matching: if impact is "app/calculator.add" and changed is "app/calculator.add" or contains ".add"
-            if "." in imp and "." in cf:
-                # Extract method name from impact (e.g., "app/calculator.add" -> "add")
-                imp_parts = imp.split(".")
-                cf_parts = cf.split(".")
-                if len(imp_parts) > 1 and len(cf_parts) > 1:
-                    imp_method = imp_parts[-1]
-                    cf_method = cf_parts[-1]
-                    # Check if file path matches and method name matches
-                    imp_file = ".".join(imp_parts[:-1])
-                    cf_file = ".".join(cf_parts[:-1])
-                    if imp_file in cf_file or cf_file.endswith(imp_file.replace("/", ".")):
-                        if imp_method == cf_method:
-                            return True
+            # Extract file and method from impact marker (format: app/calculator.add)
+            if "." in imp:
+                imp_parts = imp.split(".", 1)
+                imp_file = imp_parts[0]  # app/calculator
+                imp_method = imp_parts[1] if len(imp_parts) > 1 else None
+            else:
+                imp_file = imp
+                imp_method = None
+            
+            # Exact match
+            if imp == cf or imp_file == cf_file_norm:
+                if cf_method is None or imp_method == cf_method:
+                    return True
+            
+            # File path match (normalize both)
+            imp_file_norm = imp_file.replace("\\", "/")
+            cf_file_norm_clean = cf_file_norm.replace("\\", "/")
+            
+            if imp_file_norm == cf_file_norm_clean:
+                # Same file - if no method specified in changed, match all methods
+                if cf_method is None:
+                    return True
+                # If method specified, check method match
+                if imp_method == cf_method:
+                    return True
+            
+            # Check if file paths match (one contains the other)
+            if imp_file_norm in cf_file_norm_clean or cf_file_norm_clean in imp_file_norm:
+                if cf_method is None:
+                    # File-level change matches all methods in that file
+                    return True
+                elif imp_method == cf_method:
+                    # Method-level match
+                    return True
+                
     return False
 
 
