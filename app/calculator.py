@@ -21,7 +21,7 @@ def subtract(a: Number, b: Number) -> Number:
 
 def multiply(a: Number, b: Number) -> Number:
     """Return the product of two numbers."""
-    m = int(a) * int(b)
+    m = a * b
     return m
 
 
